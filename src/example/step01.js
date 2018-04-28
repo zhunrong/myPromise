@@ -2,22 +2,10 @@ import _Promise from '../modules/promise';
 
 //promise 执行顺序
 
-function _promiseTest() {
-    const p = new _Promise((resolve, reject) => {
-        console.log('_Promise');
-        resolve()
-    })
+export default function (isNative) {
+    const P = isNative ? Promise : _Promise;
 
-    p.then(() => {
-        console.log('resolved');
-    })
-
-    console.log('hello');
-}
-
-
-function promiseTest() {
-    const p = new Promise((resolve, reject) => {
+    const p = new P((resolve, reject) => {
         console.log('Promise');
         resolve()
     })
@@ -27,11 +15,4 @@ function promiseTest() {
     })
 
     console.log('hello');
-}
-
-
-
-export {
-    _promiseTest,
-    promiseTest
 }

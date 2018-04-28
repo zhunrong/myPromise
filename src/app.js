@@ -1,26 +1,4 @@
-import {
-    _promiseTest,
-    promiseTest
-} from './example/step02.js';
+import test from './example/step01.js';
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// _promiseTest();
-promiseTest();
+test(false);
