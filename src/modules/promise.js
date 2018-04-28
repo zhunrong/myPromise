@@ -10,6 +10,7 @@ class _Promise {
           let result = res;
           let funcIndex = 0;
 
+          //如果res是一个_Promise实例
 
           const _exective = () => {
             if (funcIndex === this.thenFuncArr.length) return;

@@ -1,9 +1,10 @@
-import _Promise from '../modules/promise';
+import _Promise from './_promise';
 
 // promise一般用法
 
 export default function (isNative) {
     const P = isNative ? Promise : _Promise;
+    console.log(isNative ? 'Promise' : '_Promise');
 
     const p = new P((resolve, reject) => {
         setTimeout(() => {

@@ -1,4 +1,4 @@
-import test from './example/step01.js';
+import test from './demo/06';
 
 
 test(false);
