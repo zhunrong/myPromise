@@ -9,8 +9,8 @@ export default function (isNative) {
 
     const p = new P((resolve, reject) => {
 
+        // resolve('p');
         throw new Error('test');
-        resolve('p');
 
     })
 
@@ -19,6 +19,8 @@ export default function (isNative) {
     }).catch(err => {
         console.log('catch', err);
     })
+
+
 
     console.log(p);
 
