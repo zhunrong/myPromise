@@ -1,27 +1,33 @@
 import _Promise from './_promise';
 
 // promise
-// 如果catch后面继续有then,会顺序执行
+// then catch 交替链式写法
 
 export default function (isNative) {
     const P = isNative ? Promise : _Promise;
     console.log(isNative ? 'Promise' : '_Promise');
 
-    const someAsyncThing = function () {
-        return new P(function (resolve, reject) {
-            // 下面一行会报错，因为x没有声明
-            resolve(x + 2);
-        });
-    };
+    const p1 = new P((resolve, reject) => {
 
-    someAsyncThing()
-        .catch(function (error) {
-            console.log('oh no', error);
+        resolve('p1');
+    })
+
+    p1.then(res => {
+        console.log('then1', res);
+
+        return new P((resolve, reject) => {
+            throw new Error('p1');
+
         })
-        .then(function () {
-            console.log('carry on');
-        });
-    // oh no [ReferenceError: x is not defined]
-    // carry on
+
+    }).catch(err => {
+        console.log('catch1', err);
+        throw new Error('p2');
+    }).then(res => {
+        console.log('then2', res);
+    }).catch(err => {
+        console.log('catch2', err);
+    })
+
 
 }

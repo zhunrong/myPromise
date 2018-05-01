@@ -7,15 +7,14 @@ export default function (isNative) {
     const P = isNative ? Promise : _Promise;
     console.log(isNative ? 'Promise' : '_Promise');
 
-    const someAsyncThing = function () {
-        return new P(function (resolve, reject) {
-            // 下面一行会报错，因为x没有声明
-            resolve(x + 2);
-        });
-    };
 
-    someAsyncThing().then(function () {
-        console.log('everything is great');
+    const p = new P((resolve, reject) => {
+        // 下面一行会报错，因为x没有声明
+        resolve(x + 2);
+    })
+
+    p.then(res => {
+        console.log("It's all right!");
     });
 
     setTimeout(() => { console.log(123) }, 2000);
