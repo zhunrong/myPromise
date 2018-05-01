@@ -162,6 +162,15 @@ class _Promise {
 
         return this;
     }
+
+    finally(callback) {
+        this.then(() => {
+            callback();
+        }, () => {
+            callback();
+        });
+        return this;
+    }
 }
 
 _Promise.resolve = function (params) {
