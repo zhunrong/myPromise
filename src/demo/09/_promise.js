@@ -24,7 +24,6 @@ class _Promise {
                                 result.then(curThenFunc);
                                 curThenFunc = this.thenFuncArr[++this.thenFuncIndex];
                             }
-                            result.catch(this.catchFunc);
                             while (curCatchFunc) {
                                 result.catch(curCatchFunc);
                                 curCatchFunc = this.catchFuncArr[++this.catchFuncIndex];
