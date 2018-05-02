@@ -154,16 +154,14 @@ class _Promise {
     return this;
   }
 
-  catch(fail) {
+  catch (fail) {
     if (typeof fail === 'function') {
       fail.type = 'fail';
       this.funcArr.push(fail);
     }
 
     return this;
-  }
-
-  finally(callback) {
+  } finally(callback) {
     this.then(() => {
       callback();
     }, () => {
@@ -206,6 +204,20 @@ _Promise.all = function (params) {
         reject(err);
       })
     })
+  })
+}
+
+_Promise.race = function (params) {
+  return new _Promise((resolve, reject) => {
+
+    params.forEach(p => {
+      p.then(res => {
+        resolve(res);
+      }).catch(err => {
+        reject(err);
+      })
+    })
+
   })
 }
 
