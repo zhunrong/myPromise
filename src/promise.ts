@@ -20,12 +20,17 @@ type FinallyObj = {
   reject: Reject
 }
 
+const FULFILLED = Symbol('fulfilled')
+const REJECTED = Symbol('rejected')
+const FINALLY = Symbol('finally')
+const VALUE = Symbol('value')
+
 export class Promise2 {
   state: 'pending' | 'fulfilled' | 'rejected' = 'pending'
-  private __fulfilled__: FulfillObj[] = []
-  private __rejected__: RejectObj[] = []
-  private __finally__: FinallyObj[] = []
-  private __value__: any = null
+  private [FULFILLED]: FulfillObj[] = []
+  private [REJECTED]: RejectObj[] = []
+  private [FINALLY]: FinallyObj[] = []
+  private [VALUE]: any = null
 
   constructor(exacutor: Executor) {
     const resolve: Resolve = value => {
@@ -34,9 +39,9 @@ export class Promise2 {
       } else {
         if (this.state !== 'pending') return
         this.state = 'fulfilled'
-        this.__value__ = value
+        this[VALUE] = value
         setTimeout(() => {
-          this.__fulfilled__.forEach(obj => {
+          this[FULFILLED].forEach(obj => {
             if (typeof obj.onFulfilled === 'function') {
               try {
                 const result = obj.onFulfilled(value)
@@ -60,9 +65,9 @@ export class Promise2 {
     const reject: Reject = reason => {
       if (this.state !== 'pending') return
       this.state = 'rejected'
-      this.__value__ = reason
+      this[VALUE] = reason
       setTimeout(() => {
-        this.__rejected__.forEach(obj => {
+        this[REJECTED].forEach(obj => {
           if (typeof obj.onRejected === 'function') {
             try {
               const result = obj.onRejected(reason)
@@ -82,14 +87,14 @@ export class Promise2 {
       }, 0)
     }
     const callFinally = () => {
-      this.__finally__.forEach(obj => {
+      this[FINALLY].forEach(obj => {
         if (typeof obj.onFinally === 'function') {
           obj.onFinally()
         }
         if (this.state === 'fulfilled') {
-          obj.resolve(this.__value__)
+          obj.resolve(this[VALUE])
         } else {
-          obj.reject(this.__value__)
+          obj.reject(this[VALUE])
         }
       })
     }
@@ -102,12 +107,12 @@ export class Promise2 {
 
   then(onFulfilled?: OnFulfilled, onRejected?: OnRejected) {
     return new Promise2((resolve, reject) => {
-      this.__fulfilled__.push({
+      this[FULFILLED].push({
         onFulfilled,
         resolve,
         reject
       })
-      this.__rejected__.push({
+      this[REJECTED].push({
         onRejected,
         resolve,
         reject
@@ -117,7 +122,7 @@ export class Promise2 {
 
   catch(onRejected?: OnRejected) {
     return new Promise2((resolve, reject) => {
-      this.__rejected__.push({
+      this[REJECTED].push({
         onRejected,
         resolve,
         reject
@@ -127,7 +132,7 @@ export class Promise2 {
 
   finally(onFinally?: OnFinally) {
     return new Promise2((resolve, reject) => {
-      this.__finally__.push({
+      this[FINALLY].push({
         onFinally,
         resolve,
         reject
