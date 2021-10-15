@@ -1,22 +1,27 @@
+declare const STATE: unique symbol;
+declare const VALUE: unique symbol;
+declare const REASON: unique symbol;
+declare const CALLBACKS: unique symbol;
+declare type Resolve = (value: any) => void;
+declare type Reject = (reason: any) => void;
+declare type Executor = (resolve: Resolve, reject: Reject) => void;
 declare type OnFulfilled = (value: any) => any;
 declare type OnRejected = (reason: any) => any;
-declare type OnFinally = () => void;
-declare type Resolve = (value?: any) => void;
-declare type Reject = (reason?: any) => void;
-declare type Executor = (resolve: Resolve, reject: Reject) => any;
-export declare class Promise2 {
-    state: 'pending' | 'fulfilled' | 'rejected';
-    private __fulfilled__;
-    private __rejected__;
-    private __finally__;
-    private __value__;
-    constructor(exacutor: Executor);
-    then(onFulfilled?: OnFulfilled, onRejected?: OnRejected): Promise2;
-    catch(onRejected?: OnRejected): Promise2;
-    finally(onFinally?: OnFinally): Promise2;
-    static all(list: Promise2[]): Promise2;
-    static race(list: Promise2[]): Promise2;
-    static reject(value?: any): Promise2;
-    static resolve(value?: any): Promise2;
+declare type Callback = {
+    onFulfilled?: OnFulfilled;
+    onRejected?: OnRejected;
+    promise2: MyPromise;
+    resolve: Resolve;
+    reject: Reject;
+};
+export declare class MyPromise {
+    static reject(reason: any): MyPromise;
+    static resolve(value: any): MyPromise;
+    [STATE]: 'pending' | 'fulfilled' | 'rejected';
+    [VALUE]: any;
+    [REASON]: any;
+    [CALLBACKS]: Callback[];
+    constructor(executor: Executor);
+    then(onFulfilled?: OnFulfilled, onRejected?: OnRejected): MyPromise;
 }
-export default Promise2;
+export default MyPromise;
