@@ -1,5 +1,7 @@
 # Promise
 
+本仓库是对 **Promise** 的实现，兼容 **Promises/A+** 规范。
+
 ## Promises/A+
 
 ### 1. 术语
