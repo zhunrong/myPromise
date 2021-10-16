@@ -20,5 +20,6 @@ export declare class MyPromise {
     [CALLBACKS]: Callback[];
     constructor(executor: Executor);
     then(onFulfilled?: OnFulfilled, onRejected?: OnRejected): MyPromise;
+    catch(onRejected: OnRejected): MyPromise;
 }
 export default MyPromise;

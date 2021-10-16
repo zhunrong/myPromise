@@ -137,12 +137,8 @@ export class MyPromise {
   [CALLBACKS]: Callback[] = [];
 
   constructor(executor: Executor) {
-    const resolve: Resolve = (value) => {
-      resolvePromise(this, value);
-    };
-    const reject: Reject = (reason) => {
-      rejectPromise(this, reason);
-    };
+    const resolve: Resolve = (value) => resolvePromise(this, value);
+    const reject: Reject = (reason) => rejectPromise(this, reason);
     try {
       executor(resolve, reject);
     } catch (error) {
@@ -159,6 +155,10 @@ export class MyPromise {
         reject,
       });
     });
+  }
+
+  catch(onRejected: OnRejected) {
+    return this.then(undefined, onRejected);
   }
 }
 
