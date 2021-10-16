@@ -10,14 +10,13 @@ declare type OnRejected = (reason: any) => any;
 declare type Callback = {
     onFulfilled?: OnFulfilled;
     onRejected?: OnRejected;
-    promise2: MyPromise;
     resolve: Resolve;
     reject: Reject;
 };
 export declare class MyPromise {
     static reject(reason: any): MyPromise;
     static resolve(value: any): MyPromise;
-    [STATE]: 'pending' | 'fulfilled' | 'rejected';
+    [STATE]: "pending" | "fulfilled" | "rejected";
     [VALUE]: any;
     [REASON]: any;
     [CALLBACKS]: Callback[];

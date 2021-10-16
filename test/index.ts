@@ -1,12 +1,17 @@
-import { MyPromise } from '../src/promise'
+import { MyPromise } from "../src/promise";
+
+function thenable(value: any) {
+  return {
+    then(onFulfilled: (value: any) => void) {
+      onFulfilled(value);
+    },
+  };
+}
 
 const promise = new MyPromise((resolve) => {
-  console.log(1);
-  resolve(3);
+  resolve(thenable(thenable(3)));
 });
 
-promise.then(value => {
-  console.log(value);
-})
-
-console.log(2);
+setTimeout(() => {
+  console.log(promise);
+}, 30);
