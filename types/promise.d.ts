@@ -1,7 +1,6 @@
 declare const STATE: unique symbol;
-declare const VALUE: unique symbol;
-declare const REASON: unique symbol;
 declare const CALLBACKS: unique symbol;
+declare const RESULT: unique symbol;
 declare type Resolve = (value: any) => void;
 declare type Reject = (reason: any) => void;
 declare type Executor = (resolve: Resolve, reject: Reject) => void;
@@ -17,8 +16,7 @@ export declare class MyPromise {
     static reject(reason: any): MyPromise;
     static resolve(value: any): MyPromise;
     [STATE]: "pending" | "fulfilled" | "rejected";
-    [VALUE]: any;
-    [REASON]: any;
+    [RESULT]: any;
     [CALLBACKS]: Callback[];
     constructor(executor: Executor);
     then(onFulfilled?: OnFulfilled, onRejected?: OnRejected): MyPromise;

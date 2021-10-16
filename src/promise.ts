@@ -1,73 +1,75 @@
-const STATE = Symbol("STATE");
-const VALUE = Symbol("VALUE");
-const REASON = Symbol("REASON");
-const CALLBACKS = Symbol("CALLBACKS");
+const STATE = Symbol("[STATE]");
+const CALLBACKS = Symbol("[CALLBACKS]");
+const RESULT = Symbol("[RESULT]");
 
-function changePromiseState(
-  promise: MyPromise,
-  state: "fulfilled" | "rejected",
-  value: any
-) {
+/**
+ * fulfill promise
+ */
+function fulfillPromise(promise: MyPromise, value: any) {
   if (promise[STATE] !== "pending") return;
-  promise[STATE] = state;
-  if (state === "fulfilled") {
-    promise[VALUE] = value;
-  } else {
-    promise[REASON] = value;
-  }
-  runCallbacks(promise);
-}
-
-function runCallbacks(promise: MyPromise) {
+  promise[STATE] = "fulfilled";
+  promise[RESULT] = value;
   setTimeout(() => {
     const callbacks = promise[CALLBACKS];
     while (callbacks.length) {
-      const { onFulfilled, onRejected, resolve, reject } = callbacks.shift()!;
-      switch (promise[STATE]) {
-        case "fulfilled":
-          if (typeof onFulfilled === "function") {
-            try {
-              const x = onFulfilled(promise[VALUE]);
-              resolve(x);
-            } catch (error) {
-              reject(error);
-            }
-          } else {
-            resolve(promise[VALUE]);
-          }
-          break;
-        case "rejected":
-          if (typeof onRejected === "function") {
-            try {
-              const x = onRejected(promise[REASON]);
-              resolve(x);
-            } catch (error) {
-              reject(error);
-            }
-          } else {
-            reject(promise[REASON]);
-          }
-          break;
+      const { onFulfilled, resolve, reject } = callbacks.shift()!;
+      if (typeof onFulfilled === "function") {
+        try {
+          const x = onFulfilled(promise[RESULT]);
+          resolve(x);
+        } catch (error) {
+          reject(error);
+        }
+      } else {
+        resolve(promise[RESULT]);
       }
     }
   }, 0);
 }
 
-function promiseResolutionProcedure(promise: MyPromise, x: any) {
+/**
+ * reject promise
+ */
+function rejectPromise(promise: MyPromise, reason: any) {
+  if (promise[STATE] !== "pending") return;
+  promise[STATE] = "rejected";
+  promise[RESULT] = reason;
+  setTimeout(() => {
+    const callbacks = promise[CALLBACKS];
+    while (callbacks.length) {
+      const { onRejected, resolve, reject } = callbacks.shift()!;
+      if (typeof onRejected === "function") {
+        try {
+          const x = onRejected(promise[RESULT]);
+          resolve(x);
+        } catch (error) {
+          reject(error);
+        }
+      } else {
+        reject(promise[RESULT]);
+      }
+    }
+  }, 0);
+}
+
+/**
+ * promise resolution procedure
+ */
+function resolvePromise(promise: MyPromise, x: any) {
   if (promise === x) {
-    changePromiseState(promise, "rejected", new TypeError());
+    rejectPromise(promise, new TypeError());
   } else if (x instanceof MyPromise) {
     if (x[STATE] === "fulfilled") {
-      changePromiseState(promise, "fulfilled", x[VALUE]);
+      fulfillPromise(promise, x[RESULT]);
     } else if (x[STATE] === "rejected") {
-      changePromiseState(promise, "rejected", x[REASON]);
+      rejectPromise(promise, x[RESULT]);
     } else {
       x.then(
         (value) => {
-          changePromiseState(promise, "fulfilled", value);
+          fulfillPromise(promise, value);
         },
         (reason) => {
-          changePromiseState(promise, "rejected", reason);
+          rejectPromise(promise, reason);
         }
       );
     }
@@ -76,32 +78,32 @@ function promiseResolutionProcedure(promise: MyPromise, x: any) {
     try {
       then = x.then;
     } catch (error) {
-      return changePromiseState(promise, "rejected", error);
+      return rejectPromise(promise, error);
     }
     if (typeof then === "function") {
       let flag = false;
-      const resolvePromise: Resolve = (value) => {
+      const resolve: Resolve = (value) => {
         if (flag) return;
         flag = true;
-        promiseResolutionProcedure(promise, value);
+        resolvePromise(promise, value);
       };
-      const rejectPromise: Reject = (reason) => {
+      const reject: Reject = (reason) => {
         if (flag) return;
         flag = true;
-        changePromiseState(promise, "rejected", reason);
+        rejectPromise(promise, reason);
       };
       try {
-        then.call(x, resolvePromise, rejectPromise);
+        then.call(x, resolve, reject);
       } catch (error) {
         if (!flag) {
-          changePromiseState(promise, "rejected", error);
+          rejectPromise(promise, error);
         }
       }
     } else {
-      changePromiseState(promise, "fulfilled", x);
+      fulfillPromise(promise, x);
     }
   } else {
-    changePromiseState(promise, "fulfilled", x);
+    fulfillPromise(promise, x);
   }
 }
 
@@ -131,16 +133,15 @@ export class MyPromise {
   }
 
   [STATE]: "pending" | "fulfilled" | "rejected" = "pending";
-  [VALUE]: any = null;
-  [REASON]: any = null;
+  [RESULT]: any = null;
   [CALLBACKS]: Callback[] = [];
 
   constructor(executor: Executor) {
     const resolve: Resolve = (value) => {
-      promiseResolutionProcedure(this, value);
+      resolvePromise(this, value);
     };
     const reject: Reject = (reason) => {
-      changePromiseState(this, "rejected", reason);
+      rejectPromise(this, reason);
     };
     try {
       executor(resolve, reject);
