@@ -107,8 +107,8 @@ function resolvePromise(promise: MyPromise, x: any) {
   }
 }
 
-type Resolve = (value: any) => void;
-type Reject = (reason: any) => void;
+type Resolve = (value?: any) => void;
+type Reject = (reason?: any) => void;
 type Executor = (resolve: Resolve, reject: Reject) => void;
 type OnFulfilled = (value: any) => any;
 type OnRejected = (reason: any) => any;
@@ -129,6 +129,27 @@ export class MyPromise {
   static resolve(value: any) {
     return new MyPromise((resolve, reject) => {
       resolve(value);
+    });
+  }
+
+  static all(promises: MyPromise[]) {
+    let count = promises.length;
+    const results: any[] = [];
+    return new MyPromise((resolve, reject) => {
+      if (count === 0) {
+        return resolve(results);
+      }
+      promises.forEach((promise, index) => {
+        promise.then(
+          (value) => {
+            results[index] = value;
+            if (--count === 0) {
+              resolve(results);
+            }
+          },
+          (reason) => reject(reason)
+        );
+      });
     });
   }
 
