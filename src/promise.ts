@@ -65,12 +65,8 @@ function resolvePromise(promise: MyPromise, x: any) {
       rejectPromise(promise, x[RESULT]);
     } else {
       x.then(
-        (value) => {
-          fulfillPromise(promise, value);
-        },
-        (reason) => {
-          rejectPromise(promise, reason);
-        }
+        (value) => fulfillPromise(promise, value),
+        (reason) => rejectPromise(promise, reason)
       );
     }
   } else if (x && /function|object/.test(typeof x)) {
@@ -147,6 +143,17 @@ export class MyPromise {
               resolve(results);
             }
           },
+          (reason) => reject(reason)
+        );
+      });
+    });
+  }
+
+  static race(promises: MyPromise[]) {
+    return new MyPromise((resolve, reject) => {
+      promises.forEach((promise) => {
+        promise.then(
+          (value) => resolve(value),
           (reason) => reject(reason)
         );
       });

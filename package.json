@@ -15,8 +15,8 @@
   },
   "scripts": {
     "lib": "tsc && webpack-cli --config webpack.lib.js",
-    "test": "promises-aplus-tests test/adapter",
-    "test:log": "promises-aplus-tests test/adapter > test.log"
+    "test": "promises-aplus-tests tests/adapter",
+    "test:log": "promises-aplus-tests tests/adapter > test.log"
   },
   "types": "./types",
   "main": "./lib/promise.js"

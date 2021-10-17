@@ -16,6 +16,7 @@ export declare class MyPromise {
     static reject(reason: any): MyPromise;
     static resolve(value: any): MyPromise;
     static all(promises: MyPromise[]): MyPromise;
+    static race(promises: MyPromise[]): MyPromise;
     [STATE]: "pending" | "fulfilled" | "rejected";
     [RESULT]: any;
     [CALLBACKS]: Callback[];
